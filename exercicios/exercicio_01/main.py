@@ -13,6 +13,7 @@ EPOCAS_MLP = 20
 PASTA_REF = 'figuras'
 AMOSTRAS_TREINO = 55_000
 AMOSTRAS_VALIDACAO = 5_000
+AMOSTRAS_TESTE = 5_000
 DATASET = "mnist"
 #DATASET = "fashion-mnist"
 
@@ -191,6 +192,8 @@ def main():
     total_treino_validacao = AMOSTRAS_TREINO + AMOSTRAS_VALIDACAO
     if len(X_treino) < total_treino_validacao:
         parser.error("O conjunto de treino não tem imagens suficientes para treino e validação.")
+    if len(X_teste) < AMOSTRAS_TESTE:
+        parser.error("O conjunto de teste não tem imagens suficientes.")
 
     # Divide aleatoriamente e de forma reproduzível os 60 mil exemplos de treino.
     indices = np.random.default_rng(SEMENTE).permutation(len(X_treino))
@@ -198,6 +201,10 @@ def main():
     indices_validacao = indices[AMOSTRAS_TREINO:total_treino_validacao]
     X_validacao, y_validacao = X_treino[indices_validacao], y_treino[indices_validacao]
     X_treino, y_treino = X_treino[indices_treino], y_treino[indices_treino]
+
+    # Usa 5 mil exemplos escolhidos de forma reprodutível do conjunto oficial de teste.
+    indices_teste = np.random.default_rng(SEMENTE).permutation(len(X_teste))[:AMOSTRAS_TESTE]
+    X_teste, y_teste = X_teste[indices_teste], y_teste[indices_teste]
 
     modelos = {
         "Perceptron": Perceptron(taxa_aprendizado=0.01, epocas=args.epocas_perceptron),
